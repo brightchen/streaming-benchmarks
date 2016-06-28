@@ -6,7 +6,7 @@
  "values":
   [
     {"name":"clicks","type":"long","aggregators":["COUNT"]},
-    {"name":"latency","type":"long","aggregators":["SUM","COUNT"]}
+    {"name":"latency","type":"long","aggregators":["SUM","COUNT","AVG"]}
   ],
  "dimensions":
   [
