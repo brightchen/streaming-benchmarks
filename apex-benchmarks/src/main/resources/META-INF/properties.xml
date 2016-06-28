@@ -79,9 +79,7 @@
     <name>dt.application.AppWithDCWithoutDe.redisServer</name>
     <value>node35.morado.com</value>
   </property>
-  AppWithDCWithoutDe
   <!-- AppWithDCWithoutDe end -->
-  
   
 </configuration>
 

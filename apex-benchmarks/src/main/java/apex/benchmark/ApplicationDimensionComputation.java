@@ -51,6 +51,8 @@ public class ApplicationDimensionComputation implements StreamingApplication
   
   protected String eventSchemaLocation = DIMENSION_SCHEMA;
   protected String PROP_STORE_PATH;
+  protected int applicationWindowCount = 10;
+  protected int checkPointWindowCount = 10;
   
   protected int storePartitionCount = 1;
   
@@ -70,19 +72,37 @@ public class ApplicationDimensionComputation implements StreamingApplication
     DimensionTupleGenerateOperator generateOperator = new DimensionTupleGenerateOperator();
     dag.addOperator("Generator", generateOperator);
     dag.setAttribute(generateOperator, Context.OperatorContext.PARTITIONER, new StatelessPartitioner<EventGenerator>(PARTITION_NUM));
-    
+    try {
+      applicationWindowCount = Integer
+          .valueOf(configuration.get(configuration.get(getApplicationName(configuration) + ".applicationWindowCount")));
+    } catch (Exception e) {
+      //ignore;
+    }
+    try {
+      checkPointWindowCount = Integer
+          .valueOf(configuration.get(configuration.get(getApplicationName(configuration) + ".checkPointWindowCount")));
+    } catch (Exception e) {
+      //ignore;
+    }
+
     populateDimensionsDAG(dag, configuration, generateOperator.outputPort);
   }
 
+  protected String getApplicationName(Configuration configuration)
+  {
+    return configuration.get("dt.attr.APPLICATION_NAME");
+  }
+  
   public void populateDimensionsDAG(DAG dag, Configuration conf, DefaultOutputPort<DimensionTuple> upstreamPort) 
   {
+    logger.info("applicationWindowCount: {}; checkPointWindowCount: {}", applicationWindowCount, checkPointWindowCount);
     final String eventSchema = SchemaUtils.jarResourceFileToString(eventSchemaLocation);
     
     // dimension
     DimensionsComputationFlexibleSingleSchemaPOJO dimensions = dag.addOperator("DimensionsComputation",
         DimensionsComputationFlexibleSingleSchemaPOJO.class);
-    dag.setAttribute(dimensions, Context.OperatorContext.APPLICATION_WINDOW_COUNT, 10);
-    dag.setAttribute(dimensions, Context.OperatorContext.CHECKPOINT_WINDOW_COUNT, 10);
+    dag.setAttribute(dimensions, Context.OperatorContext.APPLICATION_WINDOW_COUNT, applicationWindowCount);
+    dag.setAttribute(dimensions, Context.OperatorContext.CHECKPOINT_WINDOW_COUNT, checkPointWindowCount);
 
     // Set operator properties
     // key expression
@@ -107,7 +127,7 @@ public class ApplicationDimensionComputation implements StreamingApplication
     dimensions.setUnifier(new DimensionsComputationUnifierImpl<InputEvent, Aggregate>());
 
     dag.setUnifierAttribute(dimensions.output, OperatorContext.MEMORY_MB, 4096);
-    dag.setAttribute(dimensions, Context.OperatorContext.APPLICATION_WINDOW_COUNT, 10);
+    dag.setAttribute(dimensions, Context.OperatorContext.APPLICATION_WINDOW_COUNT, applicationWindowCount);
     dag.setInputPortAttribute(dimensions.input, Context.PortContext.PARTITION_PARALLEL, true);
     
     // store
@@ -185,4 +205,26 @@ public class ApplicationDimensionComputation implements StreamingApplication
     
     return wsOut;
   }
+
+  public int getApplicationWindowCount()
+  {
+    return applicationWindowCount;
+  }
+
+  public void setApplicationWindowCount(int applicationWindowCount)
+  {
+    this.applicationWindowCount = applicationWindowCount;
+  }
+
+  public int getCheckPointWindowCount()
+  {
+    return checkPointWindowCount;
+  }
+
+  public void setCheckPointWindowCount(int checkPointWindowCount)
+  {
+    this.checkPointWindowCount = checkPointWindowCount;
+  }
+  
+  
 }

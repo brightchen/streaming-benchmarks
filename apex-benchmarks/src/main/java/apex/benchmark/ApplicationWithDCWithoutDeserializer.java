@@ -6,6 +6,8 @@ package apex.benchmark;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
+
 import org.apache.hadoop.conf.Configuration;
 
 import com.datatorrent.api.Context;
@@ -18,6 +20,7 @@ import com.datatorrent.common.partitioner.StatelessPartitioner;
 public class ApplicationWithDCWithoutDeserializer extends ApplicationDimensionComputation
 {
   public static final String APP_NAME = "AppWithDCWithoutDe";
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ApplicationWithDCWithoutDeserializer.class);
   
   protected static final int PARTITION_NUM = 8;
   
@@ -32,6 +35,7 @@ public class ApplicationWithDCWithoutDeserializer extends ApplicationDimensionCo
   public void populateDAG(DAG dag, Configuration configuration)
   {
     redisServer = configuration.get("dt.application.AppWithDCWithoutDe.redisServer");
+    logger.info("redisServer: {}", redisServer);
     
     DefaultOutputPort<DimensionTuple> upstreamOutput = populateUpstreamDAG(dag, configuration);
 
