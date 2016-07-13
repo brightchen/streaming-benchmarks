@@ -32,11 +32,38 @@
   </property>
   <property>
     <name>numberOfCampaigns</name>
-    <value>100000</value>
+    <value>100</value>
+  </property>
+  <property>
+    <name>noOfGenerators</name>
+    <value>1</value>
+  </property>
+  <property>
+    <name>noRedisWriters</name>
+    <value>4</value>
   </property>
   <property>
     <name>dt.operator.redisJoin.outputport.output.unifier.attr.MEMORY_MB</name>
     <value>4072</value>
+  </property>
+  <property>
+    <name>dt.operator.redisJoin.outputport.output.unifier.attr.QUEUE_CAPACITY</name>
+    <value>65536</value>
+  </property>
+
+  <property>
+    <name>dt.operator.kafkaInput.prop.consumer.topic</name>
+    <value>benchmark_v9_8</value>
+  </property>
+
+  <property>
+    <name>dt.application.*.operator.*.attr.MEMORY_MB</name>
+    <value>3072</value>
+  </property>
+
+  <property>
+    <name>dt.operator.kafkaInput.prop.consumer.zookeeper</name>
+    <value>node21.morado.com:2181</value>
   </property>
 
   <!-- DimensionComputation begin -->

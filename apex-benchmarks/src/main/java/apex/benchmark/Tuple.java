@@ -25,5 +25,11 @@ public class Tuple implements Serializable
     this.event_time = eventTime;
     this.clicks = clicks;
   }
+
+  @Override
+  public String toString()
+  {
+    return adId + " " + campaignId + " " + event_time;
+  }
 }
 

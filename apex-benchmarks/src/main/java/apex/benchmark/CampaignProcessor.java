@@ -8,6 +8,10 @@ import com.datatorrent.api.DefaultInputPort;
 import com.datatorrent.common.util.BaseOperator;
 
 import benchmark.common.advertising.CampaignProcessorCommon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.apache.hadoop.yarn.webapp.hamlet.HamletSpec.Media.print;
 
 public class CampaignProcessor extends BaseOperator
 {
@@ -24,23 +28,52 @@ public class CampaignProcessor extends BaseOperator
     this.redisServerHost = redisServerHost;
   }
 
+  public boolean isActualLatency()
+  {
+    return actualLatency;
+  }
+
+  private boolean actualLatency=true;
+
   public transient DefaultInputPort<Tuple> input = new DefaultInputPort<Tuple>()
   {
     @Override
     public void process(Tuple tuple)
     {
       try {
-        campaignProcessorCommon.execute(String.valueOf(tuple.campaignId), String.valueOf(tuple.event_time));
+        campaignProcessorCommon.execute(tuple.campaignId, tuple.event_time);
+
+        if (actualLatency) {
+
+          long time = System.currentTimeMillis();
+          long event = Long.parseLong(tuple.event_time);
+
+          if (time - event >= 2000) {
+
+            logger.info(" High latency {}", time - event);
+          }
+
+        }
+
       } catch ( Exception exception ) {
         throw new RuntimeException("" + tuple.campaignId + ", " + tuple.event_time);
       }
     }
   };
 
+  @Override
   public void setup(Context.OperatorContext context)
   {
     campaignProcessorCommon = new CampaignProcessorCommon(redisServerHost);
     this.campaignProcessorCommon.prepare();
   }
+
+  public void setActualLatency(boolean actualLatency)
+  {
+    this.actualLatency = actualLatency;
+  }
+
+  private static final transient Logger logger = LoggerFactory.getLogger(CampaignProcessor.class);
+
 }
 

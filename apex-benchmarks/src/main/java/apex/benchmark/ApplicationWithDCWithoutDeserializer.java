@@ -53,7 +53,7 @@ public class ApplicationWithDCWithoutDeserializer extends ApplicationDimensionCo
     dag.addStream("filterTuples", eventGenerator.out, filterTuples.input).setLocality(DAG.Locality.CONTAINER_LOCAL);
     dag.addStream("filterFields", filterTuples.output, filterFields.input).setLocality(DAG.Locality.CONTAINER_LOCAL);
     dag.addStream("redisJoin", filterFields.output, redisJoin.input).setLocality(DAG.Locality.CONTAINER_LOCAL);
-    dag.addStream("converter", redisJoin.output, converter.inputPort).setLocality(DAG.Locality.CONTAINER_LOCAL);
+   // dag.addStream("converter", redisJoin.output, converter.inputPort).setLocality(DAG.Locality.CONTAINER_LOCAL);
 
     dag.setInputPortAttribute(filterTuples.input, Context.PortContext.PARTITION_PARALLEL, true);
     dag.setInputPortAttribute(filterFields.input, Context.PortContext.PARTITION_PARALLEL, true);

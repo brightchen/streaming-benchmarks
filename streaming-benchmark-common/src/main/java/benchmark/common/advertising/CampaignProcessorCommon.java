@@ -55,6 +55,11 @@ public class CampaignProcessorCommon {
     }
 
     public void execute(String campaign_id, String event_time) {
+
+        if ( campaign_id == null || event_time == null ) {
+            throw new RuntimeException("Inside campaign");
+        }
+
         Long timeBucket = Long.parseLong(event_time) / time_divisor;
         Window window = getWindow(timeBucket, campaign_id);
         window.seenCount++;
@@ -62,6 +67,16 @@ public class CampaignProcessorCommon {
         CampaignWindowPair newPair = new CampaignWindowPair(campaign_id, window);
         synchronized(need_flush) {
             need_flush.add(newPair);
+
+          //  long time = System.currentTimeMillis();
+
+        //    long actual =  time - Long.parseLong(event_time);
+          //  long yahoo = time - timeBucket * time_divisor - time_divisor;
+
+           // if ( Math.abs(actual - yahoo) >= 2000 ) {
+           //     LOG.info("Actual -> time {}, event time {}, latency {} ", time, event_time, actual);
+          //      LOG.info("Yahoo -> timebucket {} latency {}", window.timestamp, yahoo);
+          //  }
         }
         processed++;
     }
@@ -84,6 +99,7 @@ public class CampaignProcessorCommon {
             flush_jedis.hincrBy(windowUUID, "seen_count", win.seenCount);
             win.seenCount = 0L;
         }
+
         flush_jedis.hset(windowUUID, "time_updated", Long.toString(System.currentTimeMillis()));
         flush_jedis.lpush("time_updated", Long.toString(System.currentTimeMillis()));
     }

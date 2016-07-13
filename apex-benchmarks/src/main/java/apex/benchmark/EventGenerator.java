@@ -22,12 +22,11 @@ public class EventGenerator extends BaseOperator implements InputOperator
   private final String[] eventTypes = new String[]{"view", "click", "purchase"};
 
   private List<Integer> ads;
-  private final Map<Integer, List<Integer>> campaigns;
+  private Map<Integer, List<Integer>> campaigns;
 
   public EventGenerator()
   {
-    this.campaigns = generateCampaigns();
-    this.ads = flattenCampaigns();
+
   }
 
   public Map<Integer, List<Integer>> getCampaigns()
@@ -38,6 +37,12 @@ public class EventGenerator extends BaseOperator implements InputOperator
   /**
    * Generate a single element
    */
+
+  public void Init()
+  {
+    this.campaigns = generateCampaigns();
+    this.ads = flattenCampaigns();
+  }
 
   public String generateElement()
   {
@@ -106,7 +111,8 @@ public class EventGenerator extends BaseOperator implements InputOperator
   @Override
   public void emitTuples()
   {
-    for (int index = 0; index < 100; ++index) {
+    for (int index = 0; index < 50; ++index) {
+
       out.emit(generateElement());
     }
   }

@@ -27,6 +27,8 @@ public class FilterTuples extends BaseOperator
       {
         try {
           if (  jsonObject.getString("event_type").equals("view") ) {
+          //  JsonGenerator.latency(Long.getLong(jsonObject.getString("event_type")));
+
             output.emit(jsonObject);
           }
         } catch (JSONException e) {
@@ -34,6 +36,10 @@ public class FilterTuples extends BaseOperator
         }
       }
   };
+
+  @Override
+  public void endWindow() {
+  }
 
   public transient DefaultOutputPort<JSONObject> output = new DefaultOutputPort();
 }

@@ -10,11 +10,28 @@ import com.datatorrent.api.Context;
 import com.datatorrent.api.DefaultInputPort;
 import com.datatorrent.api.DefaultOutputPort;
 import com.datatorrent.common.util.BaseOperator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RedisJoin extends BaseOperator
 {
   private transient RedisAdCampaignCache redisAdCampaignCache;
   private String redisServerHost;
+  private static final transient Logger logger = LoggerFactory.getLogger(RedisJoin.class);
+
+
+  public long getTimeDiff()
+  {
+    return timeDiff;
+  }
+
+  public void setTimeDiff(long timeDiff)
+  {
+    this.timeDiff = timeDiff;
+  }
+
+  private long timeDiff = 1000;
+
 
   public String getRedisServerHost()
   {
@@ -31,10 +48,10 @@ public class RedisJoin extends BaseOperator
     @Override
     public void process(Tuple tuple)
     {
-      String campaign_id = redisAdCampaignCache.execute(String.valueOf(tuple.adId));
+      String campaign_id = redisAdCampaignCache.execute(tuple.adId);
 
       if (campaign_id == null || campaign_id.isEmpty()) {
-        return;
+        throw new RuntimeException("hello");
       }
 
       tuple.campaignId = campaign_id;

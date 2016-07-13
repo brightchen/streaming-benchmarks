@@ -3,22 +3,23 @@
  */
 package apex.benchmark;
 
-import java.util.List;
-import java.util.Map;
-
-import com.datatorrent.api.DefaultInputPort;
-import com.datatorrent.common.util.BaseOperator;
-import org.apache.hadoop.conf.Configuration;
-
 import com.datatorrent.api.Context;
 import com.datatorrent.api.DAG;
 import com.datatorrent.api.StreamingApplication;
 import com.datatorrent.api.annotation.ApplicationAnnotation;
 import com.datatorrent.common.partitioner.StatelessPartitioner;
+import org.apache.hadoop.conf.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 @ApplicationAnnotation(name = "ApplicationWithGenerator")
 public class ApplicationWithGenerator implements StreamingApplication
 {
+  private static final transient Logger logger = LoggerFactory.getLogger(ApplicationWithGenerator.class);
+
   @Override
   public void populateDAG(DAG dag, Configuration configuration)
   {
@@ -32,7 +33,11 @@ public class ApplicationWithGenerator implements StreamingApplication
 
     eventGenerator.setNumAdsPerCampaign(Integer.parseInt(configuration.get("numberOfAds")));
     eventGenerator.setNumCampaigns(Integer.parseInt(configuration.get("numberOfCampaigns")));
-    setupRedis(eventGenerator.getCampaigns(), configuration.get("redis"));
+
+    eventGenerator.init();
+    Map<String, List<String>> campaigns = eventGenerator.getCampaigns();
+
+    setupRedis(campaigns, configuration.get("redis"));
 
     // Connect the Ports in the Operators
     dag.addStream("filterTuples", eventGenerator.out, filterTuples.input).setLocality(DAG.Locality.CONTAINER_LOCAL);
@@ -44,8 +49,10 @@ public class ApplicationWithGenerator implements StreamingApplication
     dag.setInputPortAttribute(filterFields.input, Context.PortContext.PARTITION_PARALLEL, true);
     dag.setInputPortAttribute(redisJoin.input, Context.PortContext.PARTITION_PARALLEL, true);
 
-    dag.setAttribute(eventGenerator, Context.OperatorContext.PARTITIONER, new StatelessPartitioner<EventGenerator>(8));
-    dag.setAttribute(campaignProcessor, Context.OperatorContext.PARTITIONER, new StatelessPartitioner<CampaignProcessor>(8));
+    dag.setAttribute(eventGenerator, Context.OperatorContext.PARTITIONER, new StatelessPartitioner<EventGenerator>(configuration.get("noOfGenerators")));
+    dag.setAttribute(campaignProcessor, Context.OperatorContext.PARTITIONER, new StatelessPartitioner<CampaignProcessor>(configuration.get("noRedisWriters")));
+
+    dag.setInputPortAttribute(campaignProcessor.input, Context.PortContext.STREAM_CODEC, new customStreamCodec());
   }
 
   private void setupRedis(Map<String, List<String>> campaigns, String redis)
