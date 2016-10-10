@@ -15,7 +15,7 @@
     <!-- change this if you desire to use a different version of Apex -->
     <apex.version>3.4.0</apex.version>
     <apex.apppackage.classpath>lib/*.jar</apex.apppackage.classpath>
-    <malhar.version>3.4.0</malhar.version>
+    <malhar.version>3.5.0</malhar.version>
     <megh.version>3.4.0</megh.version>
   </properties>
 
@@ -308,7 +308,7 @@
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka_2.10</artifactId>
-      <version>0.8.1.1</version>
+      <version>0.8.2.1</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -407,7 +407,8 @@
     <dependency>
       <groupId>org.apache.apex</groupId>
       <artifactId>apex-engine</artifactId>
-      <version>3.5.0-SNAPSHOT</version>
+      <version>${apex.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

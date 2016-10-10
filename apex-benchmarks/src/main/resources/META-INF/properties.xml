@@ -40,7 +40,7 @@
   </property>
   <property>
     <name>noRedisWriters</name>
-    <value>4</value>
+    <value>1</value>
   </property>
   <property>
     <name>dt.operator.redisJoin.outputport.output.unifier.attr.MEMORY_MB</name>
@@ -53,7 +53,7 @@
 
   <property>
     <name>dt.operator.kafkaInput.prop.consumer.topic</name>
-    <value>benchmark_v9_8</value>
+    <value>benchmark_v1_3</value>
   </property>
 
   <property>

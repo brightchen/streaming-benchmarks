@@ -104,11 +104,22 @@ public class CampaignProcessorCommon {
         flush_jedis.lpush("time_updated", Long.toString(System.currentTimeMillis()));
     }
 
+//    protected long maxFlushTime = 0;
+//    protected int flushCount = 0;
     public void flushWindows() {
         synchronized (need_flush) {
+//            long startTime = System.currentTimeMillis();
+//            int flushSize = need_flush.size();
+//          
             for (CampaignWindowPair pair : need_flush) {
                 writeWindow(pair.campaign, pair.window);
             }
+//            long flushTime = System.currentTimeMillis() - startTime;
+//            maxFlushTime = flushTime > maxFlushTime ? flushTime : maxFlushTime;
+//            if(++flushCount >= 20) {
+//              LOG.warn("===Totally need to flushed size: {}; flush time: {}; max flush time: {}", flushSize, flushTime, maxFlushTime);
+//              flushCount = 0;
+//            }
             need_flush.clear();
         }
     }
